@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where Talent Moves</title>
+<meta name="description" content="Net talent migration in developing economies, 2015 to 2019. An analysis of World Bank x LinkedIn data by Benjamin Reyes.">
+<meta property="og:title" content="Where Talent Moves">
+<meta property="og:description" content="AI talent is the fastest-leaving talent in developing economies. An analysis of World Bank x LinkedIn talent migration data.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f7f6f2;
+    --surface: #fcfcfb;
+    --ink: #121211;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e4e3dc;
+    --axis: #c3c2b7;
+    --rule: rgba(18,18,17,0.12);
+    --dev: #d9572b;
+    --dev-soft: #f3c9b6;
+    --high: #2a78d6;
+    --high-soft: #c4daf5;
+    --tip-bg: #121211;
+    --tip-ink: #f7f6f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #111110;
+      --surface: #1a1a19;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #8d8b85;
+      --grid: #2c2c2a;
+      --axis: #44443f;
+      --rule: rgba(255,255,255,0.12);
+      --dev: #e8693d;
+      --dev-soft: #5a2c1c;
+      --high: #4d93ea;
+      --high-soft: #1d3a5e;
+      --tip-bg: #f0efec;
+      --tip-ink: #121211;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #111110; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #8d8b85;
+    --grid: #2c2c2a; --axis: #44443f; --rule: rgba(255,255,255,0.12);
+    --dev: #e8693d; --dev-soft: #5a2c1c; --high: #4d93ea; --high-soft: #1d3a5e;
+    --tip-bg: #f0efec; --tip-ink: #121211;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 400 17px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  .wide { max-width: 980px; }
+
+  header.wrap { padding-top: 72px; padding-bottom: 24px; }
+  .kicker {
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 20px; font-weight: 500;
+  }
+  h1 {
+    font-family: Newsreader, Georgia, serif; font-weight: 400;
+    font-size: clamp(36px, 7vw, 60px); line-height: 1.04; letter-spacing: -0.02em; margin: 0 0 24px;
+  }
+  h1 em { font-style: italic; color: var(--dev); }
+  .dek { font-size: clamp(18px, 2.4vw, 21px); line-height: 1.5; color: var(--ink-2); margin: 0 0 28px; max-width: 640px; }
+  .byline { font-size: 14px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; }
+  .byline strong { color: var(--ink); font-weight: 500; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule);
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: 40px 0 8px;
+  }
+  .stat { background: var(--page); padding: 20px 16px 20px 0; }
+  .stat + .stat { padding-left: 16px; }
+  .stat b {
+    display: block; font-family: Newsreader, Georgia, serif; font-weight: 400;
+    font-size: clamp(30px, 4.6vw, 42px); line-height: 1; letter-spacing: -0.02em; margin-bottom: 10px; white-space: nowrap;
+  }
+  .stat span { font-size: 13px; line-height: 1.4; color: var(--ink-2); display: block; }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+    .stat, .stat + .stat { padding: 16px 0; }
+    .stat b { font-size: 36px; }
+  }
+
+  section.wrap { padding-top: 56px; padding-bottom: 8px; }
+  .num { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dev); font-weight: 600; margin: 0 0 10px; }
+  h2 {
+    font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: clamp(26px, 4.4vw, 34px);
+    line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 16px;
+  }
+  p { margin: 0 0 18px; }
+  .ink2 { color: var(--ink-2); }
+  .k-dev { color: var(--dev); font-weight: 600; }
+  .k-high { color: var(--high); font-weight: 600; }
+
+  figure { margin: 28px 0 8px; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px 20px 14px; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.45; }
+  .fig-title { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 2px; }
+  .fig-sub { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); margin: 0 0 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .chart { position: relative; width: 100%; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { font-family: Inter, system-ui, sans-serif; }
+  @media (max-width: 560px) { figure { padding: 16px 12px 12px; margin-left: -4px; margin-right: -4px; } }
+
+  .tip {
+    position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink);
+    font-size: 12.5px; line-height: 1.4; padding: 8px 10px; border-radius: 6px; max-width: 240px;
+    opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; z-index: 5; white-space: nowrap;
+  }
+  .tip.on { opacity: 1; transform: none; }
+  .tip b { font-weight: 600; }
+
+  .pull {
+    font-family: Newsreader, Georgia, serif; font-size: clamp(22px, 3.6vw, 27px); line-height: 1.3;
+    border-left: 2px solid var(--dev); padding: 2px 0 2px 18px; margin: 32px 0; color: var(--ink);
+  }
+
+  details { border-top: 1px solid var(--rule); padding: 14px 0; }
+  details:last-of-type { border-bottom: 1px solid var(--rule); }
+  summary { cursor: pointer; font-weight: 500; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--muted); font-weight: 400; }
+  details[open] summary::after { content: "\2212"; }
+  details p, details li { font-size: 15px; color: var(--ink-2); }
+  details ul { padding-left: 18px; margin: 12px 0 0; }
+  details li { margin-bottom: 8px; }
+
+  footer.wrap { padding-top: 48px; padding-bottom: 64px; font-size: 14px; color: var(--muted); }
+  footer a, .src a { color: var(--ink-2); }
+  .theme-toggle {
+    position: fixed; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2); cursor: pointer;
+    display: grid; place-items: center; font-size: 15px; z-index: 10;
+  }
+  .table-toggle { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; margin-top: 8px; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  table.data th, table.data td { text-align: right; padding: 5px 6px; border-bottom: 1px solid var(--grid); }
+  table.data th:first-child, table.data td:first-child { text-align: left; }
+  table.data th { color: var(--muted); font-weight: 500; }
+  .tbl { display: none; max-height: 320px; overflow: auto; }
+  .tbl.on { display: block; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">&#9680;</button>
+
+<header class="wrap">
+  <p class="kicker">Worker reallocation · Developing economies · 2015 to 2019</p>
+  <h1>The talent developing economies lose fastest is <em>AI talent</em></h1>
+  <p class="dek">Job postings and employment show where demand is going. Migration shows where the workers go. Using the World Bank and LinkedIn public talent migration data, here is the reallocation layer underneath the employment trends.</p>
+  <div class="byline"><strong>Benjamin Reyes</strong> · Data science and AI engineering · Data: World Bank Group &amp; LinkedIn</div>
+
+  <div class="stats" id="stats"></div>
+</header>
+
+<main>
+  <section class="wrap">
+    <p class="num">01 · Which skills leave</p>
+    <h2>AI skills drain fastest, and they flow straight to high-income economies</h2>
+    <p>Net migration rates are measured within each skill: arrivals minus departures, per 10,000 LinkedIn members who hold that skill. In developing economies, every software, data and AI skill group below leaves faster than the typical non-tech skill. <span class="k-dev">AI leaves fastest</span>, at roughly three times the non-tech rate, while the same skills <span class="k-high">accumulate in high-income economies</span>.</p>
+    <figure>
+      <p class="fig-title">Net migration by skill group, 2019</p>
+      <p class="fig-sub">Median country, per 10,000 skill holders</p>
+      <div class="legend"><span><i style="background:var(--dev)"></i>Developing economies</span><span><i style="background:var(--high)"></i>High-income economies</span></div>
+      <div class="chart" id="c-skills"></div>
+      <figcaption>Number of countries varies by skill, since a skill group appears only where at least 50 moves were observed. Hover or tap a bar for counts.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap">
+    <p class="num">02 · A sorting story</p>
+    <h2>Tech talent amplifies whatever reallocation is already underway</h2>
+    <p>Each dot is a country. Horizontally, how fast its non-tech talent moves; vertically, how fast its tech talent moves. The cloud runs steeper than the diagonal: countries that lose workers lose their tech workers faster, and countries that gain workers gain tech workers faster. Tech skills leave faster than non-tech skills in <b id="tf"></b> developing economies.</p>
+    <figure>
+      <p class="fig-title">Tech versus non-tech net migration, 2019</p>
+      <p class="fig-sub">Median across skill groups, per 10,000 skill holders</p>
+      <div class="legend"><span><i style="background:var(--dev)"></i>Developing</span><span><i style="background:var(--high)"></i>High income</span></div>
+      <div class="chart" id="c-scatter"></div>
+      <figcaption>Dashed line marks equal rates. Below it, tech talent leaves faster (or arrives slower) than non-tech talent. Hollow markers are off the scale and pinned to the edge: Venezuela (non-tech −1,289, tech −1,716) and Cuba (−496, −1,156).</figcaption>
+    </figure>
+    <p class="pull">This is less a story of brain drain than of high-mobility workers sorting toward the locations where their skills earn the most.</p>
+  </section>
+
+  <section class="wrap">
+    <p class="num">03 · The trend</p>
+    <h2>In four years, most developing economies flipped to net losers</h2>
+    <p>Summing each country's bilateral flows gives its total net migration per 10,000 members. In 2015 the median economy in every income group was a small net gainer. By 2019 most developing economies were losing talent on net, while high-income economies kept gaining.</p>
+    <figure>
+      <p class="fig-title">Share of economies with net talent outflows</p>
+      <p class="fig-sub">Percent of countries in each group, 2015 to 2019</p>
+      <div class="legend"><span><i style="background:var(--dev)"></i>Developing (<span id="ndev"></span>)</span><span><i style="background:var(--high)"></i>High income (<span id="nhigh"></span>)</span></div>
+      <div class="chart" id="c-trend"></div>
+      <figcaption>Each annual value is LinkedIn's trailing three-year average, so the series is smoothed.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap">
+    <p class="num">04 · Which industries bleed</p>
+    <h2>The losses concentrate in health, education and knowledge services</h2>
+    <p>The industries losing talent fastest in developing economies are the ones that build human capital: health, education, professional services and ICT. Real estate, administrative services, retail and finance lose the least. Every one of these sectors gains talent in the median high-income economy.</p>
+    <figure>
+      <p class="fig-title">Net migration by industry, 2019</p>
+      <p class="fig-sub">Median developing economy, per 10,000 industry members · tick marks show the high-income median</p>
+      <div class="legend"><span><i style="background:var(--dev)"></i>Developing</span><span><i style="background:var(--high);width:3px;border-radius:1px"></i>High income</span></div>
+      <div class="chart" id="c-ind"></div>
+      <figcaption>ISIC Rev. 4 sections present in at least 20 developing economies.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap">
+    <p class="num">05 · Where they go</p>
+    <h2>North America and Western Europe absorb most of it</h2>
+    <p>For each developing economy, I took the partners it loses talent to on net and computed each one's share of that loss, then averaged across countries. Language and geography shape the routes: Latin America to the United States and Spain, francophone Africa and the Maghreb to France and Canada, South Asia to the United States, Australia and the Gulf.</p>
+    <figure>
+      <p class="fig-title">Top destinations for developing-economy talent, 2019</p>
+      <p class="fig-sub">Average share of each country's net talent loss</p>
+      <div class="chart" id="c-dest"></div>
+      <figcaption>Countries weighted equally, since the public file has no absolute member counts. Labels show for how many developing economies the destination is the largest single sink.</figcaption>
+    </figure>
+    <p>Not every route runs north. Venezuelan talent moves to Ecuador, Colombia and Peru, and Indian talent to Nepal, Rwanda and Sudan.</p>
+  </section>
+
+  <section class="wrap">
+    <p class="num">Notes</p>
+    <h2>Data and caveats</h2>
+    <details>
+      <summary>Source and definitions</summary>
+      <p>World Bank Group and LinkedIn, <em>Digital Data for Development: Talent Migration</em>, public use file (dataset 0038044). Migration is recorded when a member's job location changes country. Net means arrivals minus departures, normalised by LinkedIn members in the country, industry or skill and multiplied by 10,000. Developing economies are those the file classifies as low, lower middle or upper middle income: <span id="ncount"></span>.</p>
+    </details>
+    <details>
+      <summary>What this data can and cannot say</summary>
+      <ul>
+        <li>The latest public refresh ends in 2019, and each year is a trailing three-year average. Pandemic-era remote work and the generative AI wave are not captured.</li>
+        <li>LinkedIn over-represents urban, white-collar and knowledge-sector workers. These are flows of LinkedIn-visible talent, not total migration.</li>
+        <li>Countries need 100,000+ members, and any corridor, industry or skill needs at least 50 observed moves, so small countries and rare skills are under-represented. Restricting the tech comparison to skill groups present in at least 80% of developing economies still finds tech leaving faster in 67% of them.</li>
+        <li>Country, industry and skill rates use different denominators, so comparisons are made within each measure, never across them.</li>
+        <li>Destinations are ranked by the average share across sending countries, not by number of people.</li>
+      </ul>
+    </details>
+    <details>
+      <summary>Method</summary>
+      <p>Country totals sum bilateral net flows per base country. Skill comparisons take each country's median rate across tech skill groups (LinkedIn's Tech and Disruptive Tech categories) and across all other skill groups, then compare the two within the country. Industry rates roll detailed LinkedIn industries up to ISIC sections by country median. Analysis in Python (pandas); charts are hand-built SVG.</p>
+    </details>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Analysis and design by Benjamin Reyes, New York. Data © World Bank Group and LinkedIn Corporation, CC BY 3.0 IGO. <span class="src"><a href="https://datacatalog.worldbank.org/search/dataset/0038044" rel="noopener">Dataset</a></span></p>
+</footer>
+
+<div class="tip" id="tip"></div>
+<script src="data.js"></script>
+<script>
+(function () {
+  const D = window.TALENT;
+  const NS = "http://www.w3.org/2000/svg";
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toLocaleString("en-US");
+  const tip = document.getElementById("tip");
+
+  // Theme toggle
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+    renderAll();
+  });
+
+  // Stats and inline numbers
+  const S = D.stats, sl = D.share_losing;
+  const ai = D.skills[0];
+  document.getElementById("stats").innerHTML = [
+    [fmt(ai.dev), `net AI-skilled members per 10,000 in the median developing economy, versus ${fmt(ai.high)} in high-income economies`],
+    [`${S.tech_faster} of ${S.tech_n}`, "developing economies where tech talent leaves faster than non-tech talent"],
+    [`${sl.developing[0]}% → ${sl.developing[4]}%`, "share of developing economies losing talent on net, 2015 to 2019"],
+  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+  document.getElementById("tf").textContent = `${S.tech_faster} of ${S.tech_n}`;
+  document.getElementById("ndev").textContent = S.n_dev;
+  document.getElementById("nhigh").textContent = S.n_high;
+  document.getElementById("ncount").textContent = `${S.n_dev} developing and ${S.n_high} high-income economies`;
+
+  // Helpers
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function svgFor(id, h) {
+    const box = document.getElementById(id);
+    box.innerHTML = "";
+    const w = Math.max(280, box.clientWidth);
+    const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, width: w, height: h, role: "img" }, box);
+    return { svg, w, h, box };
+  }
+  function text(parent, x, y, str, o = {}) {
+    const t = el("text", Object.assign({ x, y, fill: css("--ink-2"), "font-size": 12 }, o), parent);
+    t.textContent = str;
+    return t;
+  }
+  function scale(d0, d1, r0, r1) { return v => r0 + (v - d0) / (d1 - d0) * (r1 - r0); }
+  function ticks(lo, hi, step) { const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(v); return t; }
+  function showTip(evt, html, box) {
+    tip.innerHTML = html;
+    tip.classList.add("on");
+    const r = (evt.touches ? evt.touches[0] : evt);
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = r.pageX + 12, y = r.pageY - th - 12;
+    if (x + tw > window.scrollX + document.documentElement.clientWidth - 8) x = r.pageX - tw - 12;
+    if (y < window.scrollY + 8) y = r.pageY + 16;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function hideTip() { tip.classList.remove("on"); }
+  function hover(node, html) {
+    node.style.cursor = "default";
+    node.addEventListener("pointerenter", e => showTip(e, html));
+    node.addEventListener("pointermove", e => showTip(e, html));
+    node.addEventListener("pointerleave", hideTip);
+    node.addEventListener("click", e => { e.stopPropagation(); showTip(e, html); });
+  }
+  document.addEventListener("click", hideTip);
+  document.addEventListener("scroll", hideTip, { passive: true });
+
+  // 1. Skills: diverging paired bars
+  function renderSkills() {
+    const rows = D.skills;
+    const narrow = document.getElementById("c-skills").clientWidth < 520;
+    const labelW = narrow ? 0 : 200, rowH = narrow ? 50 : 38, top = 22;
+    const { svg, w } = svgFor("c-skills", top + rows.length * rowH + 22);
+    const x0 = labelW + 4, x1 = w - 8;
+    const lo = -350, hi = 200;
+    const x = scale(lo, hi, x0, x1);
+    const g = el("g", {}, svg);
+    ticks(lo, hi, 100).forEach(v => {
+      el("line", { x1: x(v), x2: x(v), y1: top - 6, y2: top + rows.length * rowH, stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": v === 0 ? 1.5 : 1 }, g);
+      text(g, x(v), top + rows.length * rowH + 16, fmt(v), { "text-anchor": "middle", fill: css("--muted"), "font-size": 11 });
+    });
+    text(g, x(lo), 10, "← net loss", { fill: css("--muted"), "font-size": 11 });
+    text(g, x(hi), 10, "net gain →", { fill: css("--muted"), "font-size": 11, "text-anchor": "end" });
+    rows.forEach((r, i) => {
+      const y = top + i * rowH + (narrow ? 18 : 6);
+      const bh = narrow ? 10 : 11;
+      if (r.ref) el("line", { x1: narrow ? x0 : 0, x2: x1, y1: y - (narrow ? 20 : 8), y2: y - (narrow ? 20 : 8), stroke: css("--rule"), "stroke-dasharray": "2 3" }, g);
+      const lab = narrow
+        ? text(g, x0, y - 5, r.skill, { fill: css("--ink"), "font-size": 12.5, "font-weight": r.ref ? 400 : 500, "font-style": r.ref ? "italic" : "normal" })
+        : text(g, labelW - 8, y + bh + 1, r.skill, { "text-anchor": "end", fill: css("--ink"), "font-size": 13, "font-weight": i === 0 ? 600 : 400, "font-style": r.ref ? "italic" : "normal" });
+      [["dev", 0], ["high", 1]].forEach(([k, j]) => {
+        const v = r[k], yy = y + j * (bh + 2);
+        const xa = Math.min(x(0), x(v)), wd = Math.abs(x(v) - x(0));
+        const color = k === "dev" ? css("--dev") : css("--high");
+        const bar = el("rect", { x: xa, y: yy, width: Math.max(wd, 1), height: bh, rx: 3, fill: color, opacity: r.ref ? 0.55 : 1 }, g);
+        const lx = v < 0 ? x(v) - 5 : x(v) + 5;
+        text(g, lx, yy + bh - 1.5, fmt(v), { "text-anchor": v < 0 ? "end" : "start", fill: css("--ink-2"), "font-size": 11, "font-variant-numeric": "tabular-nums" });
+        const hit = el("rect", { x: x0, y: yy - 1, width: x1 - x0, height: bh + 2, fill: "transparent" }, g);
+        hover(hit, `<b>${r.skill}</b><br>${k === "dev" ? "Developing" : "High income"}: ${fmt(v)} per 10k<br>${r[k + "_n"]} countries`);
+        hit.addEventListener("pointerenter", () => bar.setAttribute("stroke", css("--ink")));
+        hit.addEventListener("pointerleave", () => bar.removeAttribute("stroke"));
+      });
+    });
+  }
+
+  // 2. Scatter
+  function renderScatter() {
+    const box = document.getElementById("c-scatter");
+    const w0 = Math.max(280, box.clientWidth);
+    const h = Math.min(520, Math.round(w0 * 0.82));
+    const { svg, w } = svgFor("c-scatter", h);
+    const m = { l: 44, r: 10, t: 10, b: 40 };
+    const lo = -950, hi = 800, xl = -520, xh = 600;
+    const x = scale(xl, xh, m.l, w - m.r), y = scale(lo, hi, h - m.b, m.t);
+    const g = el("g", {}, svg);
+    const step = w < 420 ? 200 : 100;
+    ticks(-400, 600, step).forEach(v => {
+      el("line", { x1: x(v), x2: x(v), y1: m.t, y2: h - m.b, stroke: v === 0 ? css("--axis") : css("--grid") }, g);
+      text(g, x(v), h - m.b + 16, fmt(v), { "text-anchor": "middle", fill: css("--muted"), "font-size": 11 });
+    });
+    ticks(-800, 800, step * (w < 420 ? 2 : 2)).forEach(v => {
+      el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? css("--axis") : css("--grid") }, g);
+      text(g, m.l - 6, y(v) + 4, fmt(v), { "text-anchor": "end", fill: css("--muted"), "font-size": 11 });
+    });
+    el("line", { x1: x(xl), y1: y(xl), x2: x(xh), y2: y(xh), stroke: css("--muted"), "stroke-dasharray": "4 4" }, g);
+    text(g, (m.l + w - m.r) / 2, h - 6, "Non-tech skills →", { "text-anchor": "middle", fill: css("--ink-2"), "font-size": 12 });
+    text(g, m.l + 6, m.t + 12, "↑ Tech skills", { fill: css("--ink-2"), "font-size": 12 });
+    text(g, x(xh) - 4, y(-820), "tech leaves faster", { "text-anchor": "end", fill: css("--muted"), "font-size": 11, "font-style": "italic" });
+    text(g, x(xl) + 8, y(640), "tech arrives faster", { fill: css("--muted"), "font-size": 11, "font-style": "italic" });
+    const pts = D.scatter.slice().sort((a, b) => a.d - b.d);
+    const r = w < 420 ? 4.5 : 5.5;
+    const LABEL = { "India": 1, "Colombia": 1, "Venezuela, RB": 1, "Canada": 1, "Tunisia": 1, "Luxembourg": 1 };
+    const labels = [];
+    pts.forEach(p => {
+      const off = p.x < xl || p.x > xh || p.y < lo || p.y > hi;
+      const cx = x(Math.max(xl, Math.min(xh, p.x))), cy = y(Math.max(lo, Math.min(hi, p.y)));
+      const col = p.d ? css("--dev") : css("--high");
+      const c = off
+        ? el("circle", { cx, cy, r, fill: css("--surface"), stroke: col, "stroke-width": 2 }, g)
+        : el("circle", { cx, cy, r, fill: col, "fill-opacity": 0.82, stroke: css("--surface"), "stroke-width": 1.5 }, g);
+      if (LABEL[p.c] && w >= 420) labels.push([cx, cy, p.c === "Venezuela, RB" ? "Venezuela, Cuba (off scale)" : p.c]);
+      const hit = el("circle", { cx, cy, r: r + 6, fill: "transparent" }, g);
+      hover(hit, `<b>${p.c}</b> · ${p.i}<br>Tech ${fmt(p.y)} · Non-tech ${fmt(p.x)} per 10k`);
+      hit.addEventListener("pointerenter", () => c.setAttribute("stroke", css("--ink")));
+      hit.addEventListener("pointerleave", () => c.setAttribute("stroke", off ? col : css("--surface")));
+    });
+    labels.forEach(([cx, cy, name]) => {
+      const left = cx > w * 0.6;
+      text(g, cx + (left ? -(r + 5) : r + 5), cy + 4, name, {
+        fill: css("--ink"), "font-size": 11.5, "font-weight": 500, "text-anchor": left ? "end" : "start",
+        stroke: css("--surface"), "stroke-width": 3.5, "paint-order": "stroke", "stroke-linejoin": "round", "pointer-events": "none" });
+    });
+  }
+
+  // 3. Trend lines
+  function renderTrend() {
+    const box = document.getElementById("c-trend");
+    const h = box.clientWidth < 420 ? 240 : 280;
+    const { svg, w } = svgFor("c-trend", h);
+    const m = { l: 40, r: 48, t: 14, b: 28 };
+    const yrs = D.years;
+    const x = scale(yrs[0], yrs[yrs.length - 1], m.l, w - m.r), y = scale(0, 100, h - m.b, m.t);
+    const g = el("g", {}, svg);
+    [0, 25, 50, 75, 100].forEach(v => {
+      el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 50 ? css("--axis") : css("--grid"), "stroke-dasharray": v === 50 ? "3 3" : "" }, g);
+      text(g, m.l - 6, y(v) + 4, v + "%", { "text-anchor": "end", fill: css("--muted"), "font-size": 11 });
+    });
+    yrs.forEach(yr => text(g, x(yr), h - 8, yr, { "text-anchor": "middle", fill: css("--muted"), "font-size": 11 }));
+    [["developing", "--dev", "Developing"], ["high", "--high", "High income"]].forEach(([k, col, name]) => {
+      const vals = D.share_losing[k];
+      el("path", { d: vals.map((v, i) => (i ? "L" : "M") + x(yrs[i]) + " " + y(v)).join(""), fill: "none", stroke: css(col), "stroke-width": 2.25, "stroke-linejoin": "round" }, g);
+      vals.forEach((v, i) => {
+        el("circle", { cx: x(yrs[i]), cy: y(v), r: 4.5, fill: css(col), stroke: css("--surface"), "stroke-width": 2 }, g);
+        const hit = el("circle", { cx: x(yrs[i]), cy: y(v), r: 14, fill: "transparent" }, g);
+        hover(hit, `<b>${name}, ${yrs[i]}</b><br>${v}% of economies losing talent<br>Median net: ${fmt(medianFor(k, i))} per 10k`);
+      });
+      text(g, x(yrs[yrs.length - 1]) + 9, y(vals[vals.length - 1]) + 4, vals[vals.length - 1] + "%", { fill: css(col), "font-size": 13, "font-weight": 600 });
+    });
+  }
+  function medianFor(k, i) {
+    if (k === "high") return D.divergence["High income"][i];
+    const all = ["Upper middle income", "Lower middle income", "Low income"].map(n => D.divergence[n][i]);
+    return all.sort((a, b) => a - b)[1];
+  }
+
+  // 4. Industries
+  function renderInd() {
+    const rows = D.industries;
+    const narrow = document.getElementById("c-ind").clientWidth < 520;
+    const labelW = narrow ? 0 : 210, rowH = narrow ? 38 : 26, top = 6;
+    const { svg, w } = svgFor("c-ind", top + rows.length * rowH + 22);
+    const x0 = labelW + 4, x1 = w - 8;
+    const x = scale(-120, 100, x0, x1);
+    const g = el("g", {}, svg);
+    ticks(-100, 100, 50).forEach(v => {
+      el("line", { x1: x(v), x2: x(v), y1: top, y2: top + rows.length * rowH, stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": v === 0 ? 1.5 : 1 }, g);
+      text(g, x(v), top + rows.length * rowH + 16, fmt(v), { "text-anchor": "middle", fill: css("--muted"), "font-size": 11 });
+    });
+    rows.forEach((r, i) => {
+      const y = top + i * rowH + (narrow ? 18 : 6), bh = narrow ? 10 : 13;
+      if (narrow) text(g, x0, y - 4, r.s, { fill: css("--ink"), "font-size": 12.5 });
+      else text(g, labelW - 8, y + bh - 2, r.s, { "text-anchor": "end", fill: css("--ink"), "font-size": 13 });
+      const bar = el("rect", { x: x(r.dev), y, width: x(0) - x(r.dev), height: bh, rx: 3, fill: css("--dev") }, g);
+      text(g, x(r.dev) - 5, y + bh - 2, fmt(r.dev), { "text-anchor": "end", fill: css("--ink-2"), "font-size": 11 });
+      el("rect", { x: x(r.high) - 1.5, y: y - 2, width: 3, height: bh + 4, rx: 1.5, fill: css("--high") }, g);
+      const hit = el("rect", { x: x0, y: y - 4, width: x1 - x0, height: bh + 8, fill: "transparent" }, g);
+      hover(hit, `<b>${r.s}</b><br>Developing median: ${fmt(r.dev)} per 10k (${r.n} countries)<br>High-income median: ${fmt(r.high)}`);
+      hit.addEventListener("pointerenter", () => bar.setAttribute("fill-opacity", 0.75));
+      hit.addEventListener("pointerleave", () => bar.removeAttribute("fill-opacity"));
+    });
+  }
+
+  // 5. Destinations
+  function renderDest() {
+    const rows = D.destinations;
+    const narrow = document.getElementById("c-dest").clientWidth < 520;
+    const labelW = narrow ? 112 : 150, rowH = 30, top = 4;
+    const { svg, w } = svgFor("c-dest", top + rows.length * rowH + 4);
+    const x0 = labelW, x1 = w - (narrow ? 92 : 100);
+    const max = Math.max(...rows.map(r => r.share));
+    const x = scale(0, max, x0, x1);
+    const g = el("g", {}, svg);
+    rows.forEach((r, i) => {
+      const y = top + i * rowH, bh = 16;
+      text(g, labelW - 10, y + bh - 3, r.c.replace("United Arab Emirates", "UAE").replace("United Kingdom", "UK").replace("United States", narrow ? "US" : "United States"),
+        { "text-anchor": "end", fill: css("--ink"), "font-size": 13 });
+      const bar = el("rect", { x: x0, y, width: x(r.share) - x0, height: bh, rx: 3, fill: r.high ? css("--high") : css("--dev") }, g);
+      const pct = text(g, x(r.share) + 6, y + bh - 3, r.share.toFixed(1) + "%", { fill: css("--ink"), "font-size": 12, "font-weight": 600 });
+      if (r.top1) text(g, x(r.share) + 6 + pct.getComputedTextLength() + 6, y + bh - 3, narrow ? `#1 for ${r.top1}` : `#1 for ${r.top1}`, { fill: css("--muted"), "font-size": 11 });
+      const hit = el("rect", { x: 0, y: y - 4, width: w, height: rowH, fill: "transparent" }, g);
+      hover(hit, `<b>${r.c}</b><br>${r.share}% of the average country's net loss<br>Net sink for ${r.senders} developing economies<br>Largest destination for ${r.top1}`);
+      hit.addEventListener("pointerenter", () => bar.setAttribute("fill-opacity", 0.75));
+      hit.addEventListener("pointerleave", () => bar.removeAttribute("fill-opacity"));
+    });
+  }
+
+  function renderAll() { renderSkills(); renderScatter(); renderTrend(); renderInd(); renderDest(); }
+  renderAll();
+  let rt, lastW = innerWidth;
+  addEventListener("resize", () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(renderAll, 120); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+})();
+</script>
+</body>
+</html>

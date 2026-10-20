@@ -1,0 +1,7 @@
+pandas
+openpyxl
+plotly
+pycountry
+nbformat
+nbclient
+ipykernel

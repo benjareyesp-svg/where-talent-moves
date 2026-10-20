@@ -1,0 +1,13 @@
+# Environment
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+
+# Deployment link (local)
+.vercel/
+site/.vercel/
+
+# Private notes
+HANDOFF.md
+outreach_message.md
